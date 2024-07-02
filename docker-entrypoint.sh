@@ -68,18 +68,6 @@ else
 fi
 sysctl -p /etc/sysctl.conf
 
-echo 'Configuring iptables...'
-echo 'NAT for OpenVPN clients'
-iptables -t nat -A POSTROUTING -s $TRUST_SUB -o eth0 -j MASQUERADE
-iptables -t nat -A POSTROUTING -s $GUEST_SUB -o eth0 -j MASQUERADE
-
-echo 'Blocking ICMP for external clients'
-iptables -A FORWARD -p icmp -j DROP --icmp-type echo-request -s $GUEST_SUB 
-iptables -A FORWARD -p icmp -j DROP --icmp-type echo-reply -s $GUEST_SUB 
-
-echo 'Blocking internal home subnet to access from external openvpn clients (Internet still available)'
-iptables -A FORWARD -s $GUEST_SUB -d $HOME_SUB -j DROP
-
 if [[ ! -s fw-rules.sh ]]; then
     echo "No additional firewall rules to apply."
 else
